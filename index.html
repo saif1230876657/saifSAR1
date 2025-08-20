@@ -26,7 +26,8 @@
             --border-color: rgba(0, 0, 0, 0.1);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-        body { background: var(--bg-primary); color: var(--text-primary); transition: background-color var(--transition), color var(--transition); overflow: hidden; }
+        /* MODIFICATION: Removed overflow:hidden to allow scrolling on pages */
+        body { background: var(--bg-primary); color: var(--text-primary); transition: background-color var(--transition), color var(--transition); }
         .hidden { display: none !important; }
 
         /* --- Global Components --- */
@@ -45,7 +46,8 @@
         /* --- Layout & Navigation --- */
         .app-container { opacity: 0; transition: opacity 0.5s ease; position: relative; z-index: 100; }
         .app-container.ready { opacity: 1; }
-        .page { display: none; padding: 70px 10px 110px; /* Increased bottom padding */ min-height: 100vh; background-color: var(--bg-primary); overflow-y: auto; }
+        /* MODIFICATION: Increased bottom padding for more scroll space */
+        .page { display: none; padding: 70px 15px 150px; min-height: 100vh; background-color: var(--bg-primary); overflow-y: auto; }
         .page.active { display: block; animation: fadeIn .3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
@@ -67,12 +69,10 @@
             scroll-snap-type: y mandatory;
             overflow-y: scroll;
             z-index: 50;
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
-        .video-swiper-container::-webkit-scrollbar {
-            display: none; /* Hide scrollbar for Chrome, Safari, Opera */
-        }
+        .video-swiper-container::-webkit-scrollbar { display: none; }
         .video-slide {
             width: 100%;
             height: 100%;
@@ -82,11 +82,7 @@
             justify-content: center;
             align-items: center;
         }
-        .video-slide video, .video-slide img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* Shows full video as requested */
-        }
+        .video-slide video, .video-slide img { width: 100%; height: 100%; object-fit: contain; }
         .video-overlay {
             position: absolute;
             inset: 0;
@@ -97,9 +93,7 @@
             background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 40%);
             color: white;
         }
-        .video-info {
-            margin-bottom: 70px; /* Space for bottom nav */
-        }
+        .video-info { margin-bottom: 70px; }
         .video-sidebar {
             position: absolute;
             bottom: 90px;
@@ -126,8 +120,7 @@
         
         .mute-indicator {
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             font-size: 4rem;
             color: rgba(255,255,255,0.8);
@@ -148,8 +141,8 @@
         .modal-body { padding: 15px; overflow-y: auto; flex-grow: 1; }
         .modal-footer { padding: 15px; border-top: 1px solid var(--border-color); }
         .close-modal-btn { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
-        .comment-item { display: flex; gap: 10px; }
-        .comment-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .comment-item { display: flex; gap: 10px; margin-bottom: 15px; }
+        .comment-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
         .comment-body { flex-grow: 1; }
         .comment-like-btn.liked { color: var(--accent-pink); }
         .comment-input { flex-grow: 1; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 20px; padding: 10px 15px; color: var(--text-primary); }
@@ -171,20 +164,17 @@
 
         /* --- Desktop/Large Screen Adjustments --- */
         @media (min-width: 768px) {
-            body {
-                background-color: #111; /* Darker background for desktop view */
-            }
+            body { background-color: #111; }
             .video-swiper-container {
-                width: 420px;  /* Phone-like width */
-                height: 90vh; /* A bit less than full height */
+                width: 420px;
+                height: 90vh;
                 max-height: 800px;
-                left: 50%;
-                top: 50%;
+                left: 50%; top: 50%;
                 transform: translate(-50%, -50%);
                 border-radius: 24px;
                 border: 4px solid var(--border-color);
                 box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-                overflow: hidden; /* Ensures rounded corners are applied */
+                overflow: hidden;
             }
         }
     </style>
@@ -192,7 +182,6 @@
 <body>
 
     <div class="onboarding-modal hidden" id="onboarding-modal">
-        <!-- Onboarding content remains the same -->
         <div class="onboarding-content">
             <h2 style="margin-bottom: 20px;">إنشاء حساب جديد</h2>
             <form id="onboarding-form">
@@ -206,11 +195,9 @@
         </div>
     </div>
 
-    <!-- Video Swiper Container -->
     <div class="video-swiper-container hidden" id="video-swiper-container"></div>
     
     <div class="app-container" id="app-container">
-        <!-- Top Navigation -->
         <div class="top-nav" id="top-nav">
             <h2 style="font-weight: 800;">TikTok</h2>
             <div style="display: flex; align-items: center; gap: 15px;">
@@ -219,18 +206,15 @@
             </div>
         </div>
 
-        <!-- Pages (for content other than feed) -->
         <div class="page" id="upload-page"></div>
         <div class="page" id="profile-page"></div>
 
-        <!-- Bottom Navigation -->
         <div class="bottom-nav">
             <div class="nav-item active" data-page="home-page"><i class="ri-home-4-fill"></i><span>الرئيسية</span></div>
             <div class="nav-item" data-page="upload-page"><i class="ri-add-circle-line"></i><span>رفع</span></div>
             <div class="nav-item" data-page="profile-page"><i class="ri-user-3-line"></i><span>ملفي</span></div>
         </div>
 
-        <!-- Modals -->
         <div class="modal-overlay" id="comments-modal">
             <div class="modal-content">
                 <div class="modal-header"><h3>التعليقات</h3><button class="close-modal-btn">&times;</button></div>
@@ -266,7 +250,6 @@
         let db = {};
         let currentVideoObserver = null;
 
-        // --- Core Data & Theme Functions ---
         const loadData = () => {
             const data = localStorage.getItem(DB_KEY);
             db = data ? JSON.parse(data) : { user: null, posts: [], theme: 'dark' };
@@ -279,7 +262,6 @@
             themeIcon.className = db.theme === 'light' ? 'ri-moon-line' : 'ri-sun-line';
         };
 
-        // --- Custom UI Functions ---
         const showToast = (message) => {
             const toast = document.createElement('div');
             toast.className = 'toast-notification';
@@ -320,7 +302,6 @@
             });
         };
 
-        // --- Rendering Functions ---
         const renderFeed = (postsToRender = db.posts) => {
             const swiperContainer = document.getElementById('video-swiper-container');
             swiperContainer.innerHTML = '';
@@ -380,23 +361,27 @@
                 <div class="profile-videos-grid" id="profile-videos-grid"></div>`;
             
             const grid = document.getElementById('profile-videos-grid');
-            [...db.posts].reverse().forEach(post => {
-                const item = document.createElement('div');
-                item.className = 'profile-video-item';
-                item.dataset.postId = post.id;
-                item.innerHTML = (post.type.startsWith('image') ? `<img src="${post.src}">` : `<video src="${post.src}#t=1"></video>`) + 
-                                 `<button class="delete-post-btn" data-post-id="${post.id}" title="حذف"><i class="ri-delete-bin-line"></i></button>`;
-                grid.appendChild(item);
-            });
+            if (db.posts.length === 0) {
+                 grid.innerHTML = `<p style="color: var(--text-secondary); text-align: center;">لم تنشر أي شيء بعد.</p>`;
+            } else {
+                [...db.posts].reverse().forEach(post => {
+                    const item = document.createElement('div');
+                    item.className = 'profile-video-item';
+                    item.dataset.postId = post.id;
+                    item.innerHTML = (post.type.startsWith('image') ? `<img src="${post.src}">` : `<video src="${post.src}#t=1"></video>`) + 
+                                     `<button class="delete-post-btn" data-post-id="${post.id}" title="حذف"><i class="ri-delete-bin-line"></i></button>`;
+                    grid.appendChild(item);
+                });
+            }
 
             document.getElementById('edit-profile-btn').addEventListener('click', () => openModal('edit-profile-modal'));
         };
 
         const renderUpload = () => {
             document.getElementById('upload-page').innerHTML = `
-                <div style="padding: 20px;">
+                <div style="padding: 20px 0;">
                     <h2>رفع منشور جديد</h2>
-                    <div style="background: var(--bg-secondary); border-radius: var(--border-radius); padding: 20px; margin-top: 15px; display: flex; flex-direction: column; gap: 15px; margin-bottom: 40px;">
+                    <div style="background: var(--bg-secondary); border-radius: var(--border-radius); padding: 20px; margin-top: 15px; display: flex; flex-direction: column; gap: 15px;">
                         <input type="file" id="file-upload-input" class="input-field" accept="video/*,image/*" required>
                         <input type="text" id="title-upload-input" class="input-field" placeholder="اكتب عنواناً..." required>
                         <div id="upload-preview" style="width: 150px; aspect-ratio: 9/16; background: #333; border-radius: 8px; overflow: hidden; margin: 10px auto; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color);">
@@ -428,11 +413,8 @@
             applyTheme(); renderFeed(); renderProfile(); renderUpload();
         };
 
-        // --- Video Player Logic ---
         const setupVideoObserver = () => {
-            if (currentVideoObserver) {
-                currentVideoObserver.disconnect();
-            }
+            if (currentVideoObserver) currentVideoObserver.disconnect();
             const options = { root: document.getElementById('video-swiper-container'), threshold: 0.8 };
             currentVideoObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -450,7 +432,6 @@
             document.querySelectorAll('.video-slide').forEach(slide => currentVideoObserver.observe(slide));
         };
 
-        // --- Event Handlers & Logic ---
         const handleUpload = () => {
             const fileInput = document.getElementById('file-upload-input'), titleInput = document.getElementById('title-upload-input'), file = fileInput.files[0];
             if (!file || !titleInput.value.trim()) return showToast('الرجاء اختيار ملف وكتابة عنوان.');
@@ -468,8 +449,7 @@
         const openModal = (modalId) => {
             const modal = document.getElementById(modalId);
             if (modalId === 'edit-profile-modal') {
-                const preview = document.getElementById('edit-avatar-picker');
-                preview.style.backgroundImage = `url(${db.user.avatar})`;
+                document.getElementById('edit-avatar-picker').style.backgroundImage = `url(${db.user.avatar})`;
                 document.getElementById('edit-username-input').value = db.user.username;
                 document.getElementById('edit-bio-input').value = db.user.bio || '';
             }
@@ -483,7 +463,9 @@
             else {
                 post.comments.forEach(c => {
                     const isLiked = c.isLiked ? 'liked' : '';
-                    commentsList.innerHTML += `<div class="comment-item"><img src="${db.user.avatar}" class="comment-avatar"><div class="comment-body"><strong>${db.user.username}</strong><p>${c.text}</p><div class="comment-actions"><span class="comment-like-btn ${isLiked}" data-post-id="${postId}" data-comment-id="${c.id}"><i class="ri-heart-fill"></i> ${c.likes}</span></div></div></div>`;
+                    const avatar = db.user.avatar; // In a real app, you'd get the commenter's avatar
+                    const username = db.user.username; // And the commenter's username
+                    commentsList.innerHTML += `<div class="comment-item"><img src="${avatar}" class="comment-avatar"><div class="comment-body"><strong>@${username}</strong><p>${c.text}</p><div style="color:var(--text-secondary); font-size:0.8rem;"><span class="comment-like-btn ${isLiked}" data-post-id="${postId}" data-comment-id="${c.id}"><i class="ri-heart-fill"></i> ${c.likes}</span></div></div></div>`;
                 });
             }
             
@@ -500,7 +482,6 @@
             openModal('comments-modal');
         };
         
-        // --- Global Event Delegation ---
         document.body.addEventListener('click', async (e) => {
             const navItem = e.target.closest('.nav-item');
             if (navItem) {
@@ -512,15 +493,18 @@
                 navItem.classList.add('active');
                 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
 
+                // MODIFICATION: Control body scrolling based on active page
                 if (pageId === 'home-page') {
                     swiper.classList.remove('hidden');
                     topNav.classList.remove('on-page');
-                    setupVideoObserver(); // Re-attach observer
+                    document.body.style.overflow = 'hidden';
+                    setupVideoObserver();
                 } else {
                     swiper.classList.add('hidden');
                     topNav.classList.add('on-page');
+                    document.body.style.overflow = 'auto';
                     document.getElementById(pageId).classList.add('active');
-                    if (currentVideoObserver) currentVideoObserver.disconnect(); // Detach observer
+                    if (currentVideoObserver) currentVideoObserver.disconnect();
                 }
             }
             
@@ -528,26 +512,25 @@
             if (actionItem) {
                 const { action, postId } = actionItem.dataset;
                 const post = db.posts.find(p => p.id === postId);
-                if (action === 'like') { post.isLiked = !post.isLiked; post.likes = (post.likes || 0) + (post.isLiked ? 1 : -1); }
+                if (!post) return;
+                if (action === 'like') { post.isLiked = !post.isLiked; post.likes = (post.likes || 0) + (post.isLiked ? 1 : -1); saveData(); renderFeed(); }
                 if (action === 'comment') openCommentsModal(postId);
-                if (action === 'share') { navigator.clipboard.writeText(`${location.href.split('#')[0]}#post/${postId}`); showToast('تم نسخ رابط الفيديو!'); }
-                saveData(); renderFeed();
+                if (action === 'share') { navigator.clipboard.writeText(window.location.href); showToast('تم نسخ رابط الفيديو!'); }
             }
 
-            const profileVideo = e.target.closest('.profile-video-item');
+            const profileVideo = e.target.closest('.profile-video-item:not(.delete-post-btn)');
             if (profileVideo && !e.target.closest('.delete-post-btn')) {
                 document.querySelector('.nav-item[data-page="home-page"]').click();
                 setTimeout(() => {
                     const targetSlide = document.getElementById(`post-${profileVideo.dataset.postId}`);
-                    if(targetSlide) targetSlide.scrollIntoView({ behavior: 'smooth' });
-                }, 100);
+                    if(targetSlide) targetSlide.scrollIntoView({ behavior: 'auto' });
+                }, 50);
             }
 
             const deleteBtn = e.target.closest('.delete-post-btn');
             if (deleteBtn) {
                 const postId = deleteBtn.dataset.postId;
-                const confirmed = await showConfirm('هل أنت متأكد من حذف هذا المنشور؟');
-                if (confirmed) {
+                if (await showConfirm('هل أنت متأكد من حذف هذا المنشور؟')) {
                     db.posts = db.posts.filter(p => p.id !== postId);
                     saveData(); renderAll();
                 }
@@ -557,18 +540,19 @@
             if(commentLike){
                 const {postId, commentId} = commentLike.dataset;
                 const post = db.posts.find(p => p.id === postId);
-                const comment = post.comments.find(c => c.id === commentId);
-                comment.isLiked = !comment.isLiked;
-                comment.likes += comment.isLiked ? 1 : -1;
-                saveData(); openCommentsModal(postId);
+                const comment = post?.comments.find(c => c.id === commentId);
+                if (comment) {
+                    comment.isLiked = !comment.isLiked;
+                    comment.likes += comment.isLiked ? 1 : -1;
+                    saveData(); openCommentsModal(postId);
+                }
             }
             
-            const closeModalBtn = e.target.closest('.close-modal-btn');
-            if(closeModalBtn){
+            const closeModalBtn = e.target.closest('.close-modal-btn, .modal-overlay:not(.modal-content)');
+            if(closeModalBtn && !e.target.closest('.modal-content')){
                 closeModalBtn.closest('.modal-overlay').classList.remove('active');
             }
 
-            // Mute/Unmute video
             const videoSlide = e.target.closest('.video-slide');
             if (videoSlide && e.target.tagName === 'VIDEO') {
                 const video = e.target;
@@ -580,19 +564,21 @@
             }
         });
 
-        // --- Init, Forms, and Onboarding ---
         const init = () => {
             if (loadData()) {
                 document.getElementById('onboarding-modal').classList.add('hidden');
                 document.getElementById('app-container').classList.add('ready');
                 document.getElementById('video-swiper-container').classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // Lock scroll for feed on start
                 renderAll();
             } else {
                 document.getElementById('onboarding-modal').classList.remove('hidden');
+                document.body.style.overflow = 'auto'; // Allow scroll if modal is open
             }
         };
 
-        const onboardingForm = document.getElementById('onboarding-form'), avatarPicker = document.getElementById('onboarding-avatar-picker');
+        const onboardingForm = document.getElementById('onboarding-form');
+        const avatarPicker = document.getElementById('onboarding-avatar-picker');
         let onboardingAvatarUrl = '';
         avatarPicker.addEventListener('click', () => document.getElementById('onboarding-avatar-input').click());
         document.getElementById('onboarding-avatar-input').addEventListener('change', e => {
@@ -616,6 +602,7 @@
                 password: document.getElementById('onboarding-password-input').value,
                 avatar: onboardingAvatarUrl, bio: 'مستخدم جديد!'
             };
+            db.posts = []; // Start with fresh posts
             saveData(); init();
         });
 
@@ -634,6 +621,7 @@
                 const reader = new FileReader();
                 reader.onload = event => {
                     db.user.avatar = event.target.result;
+                    saveData();
                     document.getElementById('edit-avatar-picker').style.backgroundImage = `url(${event.target.result})`;
                 };
                 reader.readAsDataURL(e.target.files[0]);
